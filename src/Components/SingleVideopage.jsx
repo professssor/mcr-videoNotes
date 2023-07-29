@@ -32,9 +32,6 @@ export default function SingleVideoPage() {
   if (!selectedVideo) {
     return <h1>Video not found</h1>;
   }
-  useEffect(() => {
-    handleWatchlist;
-  }, [watchlistArray, watchedToggle]);
 
   const handleWatchlist = () => {
     setWatchedToggle(!watchedToggle);
