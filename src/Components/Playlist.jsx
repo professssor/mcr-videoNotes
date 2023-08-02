@@ -2,18 +2,21 @@ import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { PlayListAtom } from "../Atoms/PlaylistAtom";
 import Sidebar from "./Sidebar";
-import { Link } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
+import { ModalToggle } from "../Atoms/ModalToggleAtom";
+import Modal from "./Modal";
 
 const Playlist = () => {
   const [playlistArray, setPlaylistArray] = useRecoilState(PlayListAtom);
-
+  const [modal, setModal] = useRecoilState(ModalToggle);
   const handleDelete = (videoItem) => {
     const newArray = playlistArray.filter(
       (playlist) => playlist.name !== videoItem.name
     );
     setPlaylistArray(newArray);
   };
+  console.log(playlistArray);
 
   return (
     <div style={{ display: "flex" }}>
@@ -22,6 +25,7 @@ const Playlist = () => {
       </div>
       <div style={{ flex: 3 }}>
         <div>
+          {modal && <Modal />}
           <h2>Playlist</h2>
           {playlistArray.length === 0 ? (
             <h1 style={{ margin: "auto" }}>no Playlist added</h1>
@@ -46,41 +50,49 @@ const Playlist = () => {
                     width: "300px",
                   }}
                 >
-                  {videoItem.thumbnail && (
-                    <img
-                      src={videoItem.thumbnail}
-                      alt={`Thumbnail for ${videoItem.name}`}
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        objectFit: "cover",
-                      }}
-                    />
-                  )}
-
-                  <div>
-                    <div
-                      style={{
-                        display: "flex",
-                      }}
-                    >
-                      <h5
+                  <Link
+                    style={{ textDecoration: "none", color: "black" }}
+                    to={`/category/${videoItem.category}/video/${videoItem.id}`}
+                  >
+                    {videoItem.thumbnail && (
+                      <img
+                        src={videoItem.thumbnail}
+                        alt={`Thumbnail for ${videoItem.name}`}
                         style={{
-                          margin: "auto",
-                          color: "#333",
-                          fontSize: "16px",
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
                         }}
                       >
-                        {videoItem.name}
-                      </h5>
-                      <p>my personal recommendations</p>
+                        <h5
+                          style={{
+                            margin: "auto",
+                            color: "#333",
+                            fontSize: "16px",
+                          }}
+                        >
+                          {videoItem.name}
+                        </h5>
+                        <p>my personal recommendations</p>
+                      </div>
                     </div>
-                    <p onClick={() => handleDelete(videoItem)}>❌ </p>
-                  </div>
+                  </Link>
+
+                  <p onClick={() => handleDelete(videoItem)}>Remove❌</p>
                 </div>
               ))}
 
-              <h2>add more playlist </h2>
+              <h2 onClick={() => setModal(true)} style={{ margin: "auto" }}>
+                ➕add more playlist
+              </h2>
             </div>
           )}
         </div>

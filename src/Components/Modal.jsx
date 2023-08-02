@@ -3,23 +3,21 @@ import { ModalToggle } from "../Atoms/ModalToggleAtom";
 import { useRecoilState } from "recoil";
 import { PlayListAtom } from "../Atoms/PlaylistAtom";
 
-const Modal = ({ title, creator, category, thumbnail }) => {
+const Modal = ({ title, creator, category, thumbnail, _id }) => {
   const [playlistName, setPlaylistName] = useState("");
-  const [addVideoChecked, setAddVideoChecked] = useState(false);
-
   const [modal, setModal] = useRecoilState(ModalToggle);
   const [playlistArray, setPlaylistArray] = useRecoilState(PlayListAtom);
 
   const handleSubmit = () => {
-    if (playlistName.trim() !== "") {
-      const newPlaylistItem = {
-        name: playlistName,
-        ...(addVideoChecked
-          ? { title, creator, category, thumbnail }
-          : "no entry"),
-      };
-      setPlaylistArray([...playlistArray, newPlaylistItem]);
-    }
+    const newPlaylistItem = {
+      name: playlistName,
+      title: title,
+      creator: creator,
+      category: category,
+      thumbnail: thumbnail,
+      id: _id,
+    };
+    setPlaylistArray([...playlistArray, newPlaylistItem]);
     setModal(false);
   };
 
@@ -47,7 +45,6 @@ const Modal = ({ title, creator, category, thumbnail }) => {
         }}
       >
         <h2 style={{ textAlign: "center" }}>Add Playlist</h2>
-
         <div style={{ marginBottom: "10px" }}>
           <label htmlFor="playlistName">Playlist Name:</label>
           <input
@@ -56,22 +53,42 @@ const Modal = ({ title, creator, category, thumbnail }) => {
             value={playlistName}
             onChange={(e) => setPlaylistName(e.target.value)}
             required
+            style={{
+              width: "100%",
+              padding: "8px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
           />
-        </div>
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            type="checkbox"
-            id="addVideoChecked"
-            checked={addVideoChecked}
-            onChange={(e) => setAddVideoChecked(e.target.checked)}
-          />
-          <label htmlFor="addVideoChecked">Add this video</label>
         </div>
         <div style={{ textAlign: "center" }}>
-          <button type="button" onClick={handleSubmit}>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            style={{
+              padding: "10px 20px",
+              marginRight: "10px",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              background: "#4caf50",
+              color: "white",
+            }}
+          >
             Submit
           </button>
-          <button type="button" onClick={() => setModal(false)}>
+          <button
+            type="button"
+            onClick={() => setModal(false)}
+            style={{
+              padding: "10px 20px",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              background: "#f44336",
+              color: "white",
+            }}
+          >
             Cancel
           </button>
         </div>

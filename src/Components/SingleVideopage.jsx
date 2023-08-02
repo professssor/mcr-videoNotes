@@ -11,9 +11,29 @@ import { watchedIconToggleAtom } from "../Atoms/watchedIconToggleAtom";
 import Modal from "./Modal";
 import { ModalToggle } from "../Atoms/ModalToggleAtom";
 import { NotesAtomState } from "../Atoms/NotesAtom";
+import MoreVideo from "./MoreVideo";
+
 export default function SingleVideoPage() {
+  const [noteArray, setNoteArray] = useState([]);
   const { videoId } = useParams();
+
+  useEffect(() => {
+    localStorage.setItem("videoss", JSON.stringify(videos));
+
+    const theVideo = JSON.parse(localStorage.getItem("videoss")).find(
+      (video) => video._id === Number(videoId)
+    );
+
+    if (theVideo) {
+      setNoteArray(theVideo.note);
+    }
+  }, [videoId]);
+
   const selectedVideo = videos.find((video) => video._id === Number(videoId));
+  const moreVideoData = videos.filter(
+    (videos) => videos._id !== selectedVideo._id
+  );
+
   const [watchlistArray, setWatchlistArray] = useRecoilState(WatchedListAtom);
   const [watchedToggle, setWatchedToggle] = useRecoilState(
     watchedIconToggleAtom
@@ -24,8 +44,29 @@ export default function SingleVideoPage() {
   const [noteText, setNoteText] = useState("");
 
   const handleSubmit = (e) => {
+    e.preventDefault();
     setNoteText(e.target.value);
-    setNotes([...notes, { value: noteText }]);
+
+    const updatedNote = videos.find((note) => note._id === selectedVideo._id);
+    const correspondingVideo = videos.find(
+      (video) => video._id === selectedVideo._id
+    );
+
+    correspondingVideo.note = [...correspondingVideo.note, noteText];
+
+    // Update notes in state
+    setNoteArray([...noteArray, noteText]);
+
+    // Save notes to localStorage
+    localStorage.setItem(
+      "videoss",
+      JSON.stringify(
+        videos.map((video) =>
+          video._id === selectedVideo._id ? correspondingVideo : video
+        )
+      )
+    );
+
     handleNotesToggle();
   };
 
@@ -37,7 +78,7 @@ export default function SingleVideoPage() {
     setWatchedToggle(!watchedToggle);
 
     if (
-      !watchlistArray.some((video) => video._id == selectedVideo.id) &&
+      !watchlistArray.some((video) => video._id === selectedVideo._id) &&
       !watchedToggle
     ) {
       // Add the video to the watchlist if it's not already in the list
@@ -58,18 +99,29 @@ export default function SingleVideoPage() {
 
   return (
     <div style={{ width: "100vw" }}>
-      <div style={{ display: "flex", width: "100vw" }}>
+      <div
+        style={{
+          display: "flex",
+        }}
+      >
         <section>
           <Sidebar />
         </section>
         {modal && <Modal {...selectedVideo} />}
-        <section style={{ flex: "1", padding: "20px" }}>
+
+        <section
+          style={{
+            background: "#FAF3F0",
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+          }}
+        >
           <div
             style={{
               position: "relative",
-              paddingBottom: "40%",
-              height: "0",
-              marginBottom: "20px",
+              height: "25rem",
+              width: "50vw",
             }}
           >
             <iframe
@@ -88,7 +140,6 @@ export default function SingleVideoPage() {
           </div>
           <section
             style={{
-              display: "flex",
               width: "100%",
               alignItems: "center",
               justifyContent: "space-around",
@@ -113,31 +164,52 @@ export default function SingleVideoPage() {
               />
             </section>
           </section>
-          {showNotes && (
-            <div style={{ marginTop: "1rem" }}>
-              <h3>Add Note</h3>
 
-              <textarea
-                value={noteText}
-                rows={4}
-                cols={50}
-                placeholder="Type your notes here..."
-                onChange={(e) => {
-                  setNoteText(e.target.value);
-                }}
-
-                // Implement logic to save the notes if needed
-              ></textarea>
-              <button onClick={handleSubmit}>submit</button>
-            </div>
-          )}
+          <MoreVideo data={moreVideoData} />
         </section>
-        <div style={{ width: "30rem" }}>
+        {showNotes && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h3>Add Note</h3>
+
+            <textarea
+              style={{ border: "solid 1px ", borderRadius: "1rem" }}
+              value={noteText}
+              rows={4}
+              cols={50}
+              placeholder="Type your notes here..."
+              onChange={(e) => {
+                setNoteText(e.target.value);
+              }}
+            ></textarea>
+            <button
+              style={{
+                padding: "1rem",
+                background: "#91C8E4",
+                border: "none",
+              }}
+              onClick={(e) => handleSubmit(e)}
+            >
+              submit
+            </button>
+          </div>
+        )}
+
+        <div
+          style={{ marginLeft: "7rem", background: "#D4E2D4", width: "100%" }}
+        >
           <h2 style={{}}>Added Notes</h2>
-          {notes.map((note) => (
-            <p key={note.id} style={{ marginBottom: "0.5rem" }}>
-              {note.value}
-            </p>
+
+          {noteArray.length === 0 && <h4>no notes present</h4>}
+          {noteArray.map((note, index) => (
+            <div key={index}>
+              <p>{note}</p>
+            </div>
           ))}
         </div>
       </div>
