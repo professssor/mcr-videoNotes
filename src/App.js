@@ -10,6 +10,7 @@ import SingleVideoPage from "./Components/SingleVideopage";
 import WatchLaterComp from "./Components/WatchLaterComp";
 import ExploreComponent from "./Components/ExplorePage";
 import Playlist from "./Components/Playlist";
+import NoPlaylist from "./Components/NoPlaylist";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
           path="/category/:categoryName/video/:videoId"
           element={<SingleVideoPage />}
         />
+
+        <Route path="/noplaylist" element={<NoPlaylist />} />
         <Route path="watchlater" element={<WatchLaterComp />} />
         <Route path="/explore" element={<ExploreComponent />} />
         <Route path="/playlist" element={<Playlist />} />

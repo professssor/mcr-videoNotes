@@ -28,7 +28,9 @@ const Playlist = () => {
           {modal && <Modal />}
           <h2>Playlist</h2>
           {playlistArray.length === 0 ? (
-            <h1 style={{ margin: "auto" }}>no Playlist added</h1>
+            <h2 onClick={() => setModal(true)} style={{ margin: "auto" }}>
+              ➕add more playlist
+            </h2>
           ) : (
             <div
               style={{
@@ -52,7 +54,11 @@ const Playlist = () => {
                 >
                   <Link
                     style={{ textDecoration: "none", color: "black" }}
-                    to={`/category/${videoItem.category}/video/${videoItem.id}`}
+                    to={
+                      videoItem.category
+                        ? `/category/${videoItem.category}/video/${videoItem.id}`
+                        : `/noplaylist`
+                    }
                   >
                     {videoItem.thumbnail && (
                       <img

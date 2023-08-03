@@ -12,11 +12,23 @@ import Modal from "./Modal";
 import { ModalToggle } from "../Atoms/ModalToggleAtom";
 import { NotesAtomState } from "../Atoms/NotesAtom";
 import MoreVideo from "./MoreVideo";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import EditNoteModal from "./EditNoteModal";
+import { EditNoteToggleAtom } from "../Atoms/EditNoteToggle";
+import { EditNoteText } from "../Atoms/EditNoteText";
+import { NoteFunctionAtom } from "../Atoms/NoteFunctionAtom";
 
 export default function SingleVideoPage() {
   const [noteArray, setNoteArray] = useState([]);
   const { videoId } = useParams();
+  const [noteModalToggle, setNoteModalToggle] =
+    useRecoilState(EditNoteToggleAtom);
+  const [noteFunction, setNoteFunction] = useRecoilState(NoteFunctionAtom);
 
+  const [fetchData, setFetchData] = useState(false);
+  const videoProfile = localStorage.getItem("videoss");
+
+  const [editnoteText, setEditNoteText] = useRecoilState(EditNoteText);
   useEffect(() => {
     localStorage.setItem("videoss", JSON.stringify(videos));
 
@@ -43,6 +55,42 @@ export default function SingleVideoPage() {
   const [notes, setNotes] = useRecoilState(NotesAtomState);
   const [noteText, setNoteText] = useState("");
 
+  const handleEdit = (index) => {
+    setNoteModalToggle(true);
+
+    noteFunction &&
+      editnoteText.length > 0 &&
+      (() => {
+        const correspondingVideo = videos.find(
+          (video) => video._id === selectedVideo._id
+        );
+
+        const updatedNote = editnoteText.length === 0 ? noteText : editnoteText;
+        correspondingVideo.note[index] = updatedNote;
+
+        // Update notes in state
+        setNoteArray([
+          ...noteArray.slice(0, index),
+          updatedNote,
+          ...noteArray.slice(index + 1),
+        ]);
+
+        // Save notes to localStorage
+        localStorage.setItem(
+          "videoss",
+          JSON.stringify(
+            videos.map((video) =>
+              video._id === selectedVideo._id ? correspondingVideo : video
+            )
+          )
+        );
+        setFetchData(true);
+      })();
+
+    // Set the noteModalToggle state to true after handling the edit
+  };
+
+  console.log(editnoteText);
   const handleSubmit = (e) => {
     e.preventDefault();
     setNoteText(e.target.value);
@@ -178,7 +226,11 @@ export default function SingleVideoPage() {
             <h3>Add Note</h3>
 
             <textarea
-              style={{ border: "solid 1px ", borderRadius: "1rem" }}
+              style={{
+                border: "solid 1px ",
+                borderRadius: "1rem",
+                margin: "3rem",
+              }}
               value={noteText}
               rows={4}
               cols={50}
@@ -203,13 +255,25 @@ export default function SingleVideoPage() {
         <div
           style={{ marginLeft: "7rem", background: "#D4E2D4", width: "100%" }}
         >
-          <h2 style={{}}>Added Notes</h2>
+          <h2>Added Notes</h2>
 
           {noteArray.length === 0 && <h4>no notes present</h4>}
           {noteArray.map((note, index) => (
-            <div key={index}>
-              <p>{note}</p>
-            </div>
+            <>
+              {noteModalToggle && <EditNoteModal text={note} />}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <p>{note}</p>{" "}
+                <span onClick={() => handleEdit(index)}>
+                  <EditNoteIcon />
+                </span>
+              </div>
+            </>
           ))}
         </div>
       </div>
