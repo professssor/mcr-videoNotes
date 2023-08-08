@@ -36,6 +36,8 @@ const styles = {
 export default function MoreVideo({ data }) {
   return (
     <div>
+      <h3 style={{ textAlign: " left", padding: "1.5rem" }}>Related Videos</h3>
+
       {data.map((eachVideo) => (
         <Link
           style={{ textDecoration: "none", color: "black" }}
